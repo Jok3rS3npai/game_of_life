@@ -39,11 +39,16 @@ def get_toggled_neighbors(pos_x, pos_y):
     # Get top left neighbor cell
     neighbor_x = pos_x - 1
     neighbor_y = pos_y - 1
-    for i in range (0,9):
-        print(i)
-        if (neighbor_x >= 0 and neighbor_y >= 0) or (neighbor_x =< GRID_WIDTH and neighbor_y =< GRID_HEIGHT):
-            if grid[neighbor_x][neighbor_y] == 1:
+    # Checks if the neigbors are a 1 or a 0
+    for i in range (1,10):
+        print(neighbor_y)
+        if 0 >= neighbor_x <= len(grid[0]) and 0 >= neighbor_y <= len(grid) - 1:
+            if grid[neighbor_y][neighbor_x] == 1:
                 neighbors += 1
+        neighbor_y += 1
+        # If the neighbor is at the end of the row, move to the next row
+        if neighbor_x % 3 == 0:
+            neighbor_x += 1
     # Return the number of neighbors - 1 because we don't want to count the cell itself 
     if neighbors > 0:
         return neighbors - 1
@@ -51,7 +56,7 @@ def get_toggled_neighbors(pos_x, pos_y):
         return neighbors 
 
 # Function to generate a sidebar with the control explanations
-def sidebar():
+def sidebar(screen):
     # Create a new surface for the sidebar
     sidebar = pygame.Surface((200, HEIGHT))
 
@@ -78,54 +83,60 @@ def sidebar():
         sidebar.blit(text, (10, 40 + i * 30))
 
     # Blit the sidebar onto the main screen
-    screen.blit(sidebar, (WIDTH, 0))
+    screen.blit(sidebar, (WIDTH - 200, 0))
 
-# Game Loop
-running = True
-while running:
-    # Checks if the rules of life are being followed
-    for y, row in enumerate(grid):
-        for x, cell in enumerate(row):
-            neighbors = get_toggled_neighbors(x, y)
-            grid[y][x] = rules_of_life(cell, neighbors)
+def main():
+    # Game Loop
+    running = True
+    while running:
+        # Checks if the rules of life are being followed
+        for y, row in enumerate(grid):
+            for x, cell in enumerate(row):
+                neighbors = get_toggled_neighbors(y, x)
+                grid[y][x] = rules_of_life(cell, neighbors)
 
-    # Checks for events in the game
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            # Left click to toggle cell
-            if event.button == 1:
-                x, y = pygame.mouse.get_pos()
-                grid_x, grid_y = get_grid_pos(x, y)
-                # Toggle cell
-                grid[grid_y][grid_x] = 1
+        # Checks for events in the game
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Left click to toggle cell
+                if event.button == 1:
+                    x, y = pygame.mouse.get_pos()
+                    grid_x, grid_y = get_grid_pos(x, y)
+                    # Toggle cell
+                    grid[grid_y][grid_x] = 1
 
-            # Right click to clear cell
-            elif event.button == 3:
-                x, y = pygame.mouse.get_pos()
-                grid_x, grid_y = get_grid_pos(x, y)
-                # Clear cell
-                grid[grid_y][grid_x] = 0
+                # Right click to clear cell
+                elif event.button == 3:
+                    x, y = pygame.mouse.get_pos()
+                    grid_x, grid_y = get_grid_pos(x, y)
+                    # Clear cell
+                    grid[grid_y][grid_x] = 0
 
-    # Draw the sidebar
-    sidebar()
+        # Draw the sidebar
+        sidebar(screen)
 
-    # Clear the screen
-    screen.fill(BLACK)
+        # Clear the screen
+        screen.fill(BLACK)
 
-    # Draw the grid
-    draw_grid()
+        # Draw the grid
+        draw_grid()
 
-    # Hihglight cell under mouse
-    x, y = pygame.mouse.get_pos()
-    grid_x, grid_y = get_grid_pos(x, y)
-    pygame.draw.rect(screen, GREEN, (grid_x * CELL_SIZE, grid_y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        # Hihglight cell under mouse
+        x, y = pygame.mouse.get_pos()
+        grid_x, grid_y = get_grid_pos(x, y)
+        pygame.draw.rect(screen, GREEN, (grid_x * CELL_SIZE, grid_y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
-    # Color clicked cells
-    for y, row in enumerate(grid):
-        for x, cell in enumerate(row):
-            if cell == 1:
-                pygame.draw.rect(screen, GREEN, (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-                print(grid)
-    pygame.display.flip()
+        # Color clicked cells
+        for y, row in enumerate(grid):
+            for x, cell in enumerate(row):
+                if cell == 1:
+                    pygame.draw.rect(screen, GREEN, (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                    print(grid)
+        pygame.display.flip()
+
+# Game execution
+main()
+#print(grid[31][0])
+print("rows:", len(grid), "columns:", len(grid[0]))

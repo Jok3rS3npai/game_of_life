@@ -1,5 +1,3 @@
 Still to do:
 
-- Generate a sidebar
-- That the game starts AFTER the press of the sace bar and not directly
 - Testing the game of correct game logic
